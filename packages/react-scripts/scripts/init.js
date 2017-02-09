@@ -24,10 +24,10 @@ module.exports = function(appPath, appName, verbose, originalDirectory, template
 
   // Setup the script rules
   appPackage.scripts = {
-    'start': 'react-scripts-ts start',
-    'build': 'react-scripts-ts build',
-    'test': 'react-scripts-ts test --env=jsdom',
-    'eject': 'react-scripts-ts eject'
+    'start': 'react-scripts-sedona start',
+    'build': 'react-scripts-sedona build',
+    'test': 'react-scripts-sedona test --env=jsdom',
+    'eject': 'react-scripts-sedona eject'
   };
 
   fs.writeFileSync(
