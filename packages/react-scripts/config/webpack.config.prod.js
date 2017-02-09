@@ -18,6 +18,7 @@ var InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 var url = require('url');
 var paths = require('./paths');
 var getClientEnvironment = require('./env');
+var getCustomConfig = require('./get-custom-config');
 
 // @remove-on-eject-begin
 // `path` is not used after eject - see https://github.com/facebookincubator/create-react-app/issues/1174
@@ -51,6 +52,8 @@ var publicPath = ensureSlash(homepagePathname, true);
 var publicUrl = ensureSlash(homepagePathname, false);
 // Get environment variables to inject into our app.
 var env = getClientEnvironment(publicUrl);
+//Get custom configuration for injecting plugins, presets and loaders
+var customConfig = getCustomConfig(true);
 
 // Assert this just to be safe.
 // Development builds of React are slow and not intended for production.
@@ -136,7 +139,7 @@ module.exports = {
           /\.css$/,
           /\.json$/,
           /\.svg$/
-        ],
+        ].concat(customConfig.excludedFilesRegex),
         loader: 'url',
         query: {
           limit: 10000,
@@ -147,7 +150,16 @@ module.exports = {
       {
         test: /\.(ts|tsx)$/,
         include: paths.appSrc,
+        // TODO: move to customizers (TS/BABEL)
         loader: 'ts',
+        // loader: 'babel',
+        // @remove-on-eject-begin
+        /*query: {
+          babelrc: false,
+          presets: [require.resolve('babel-preset-react-app')].concat(customConfig.presets),
+          plugins: [].concat(customConfig.babelPlugins),
+        },*/
+        // @remove-on-eject-end
       },
       // The notation here is somewhat confusing.
       // "postcss" loader applies autoprefixer to our CSS.
@@ -163,7 +175,7 @@ module.exports = {
       // in the main CSS file.
       {
         test: /\.css$/,
-        loader: ExtractTextPlugin.extract('style', 'css?importLoaders=1!postcss')
+        loader: ExtractTextPlugin.extract.apply(null, customConfig.values.CSS_MODULES ? ['style', 'css?modules&importLoaders=1', 'postcss'] : ['style', 'css?importLoaders=1', 'postcss'])
         // Note: this won't work without `new ExtractTextPlugin()` in `plugins`.
       },
       // JSON is not enabled by default in Webpack but both Node and Browserify
@@ -182,10 +194,10 @@ module.exports = {
       }
       // ** STOP ** Are you adding a new loader?
       // Remember to add the new extension(s) to the "url" loader exclusion list.
-    ]
+    ].concat(customConfig.loaders)
   },
   // We use PostCSS for autoprefixing only.
-  postcss: function() {
+  postcss: function () {
     return [
       autoprefixer({
         browsers: [
@@ -253,7 +265,7 @@ module.exports = {
     new ManifestPlugin({
       fileName: 'asset-manifest.json'
     })
-  ],
+  ].concat(customConfig.plugins),
   // Some libraries import Node modules but don't use them in the browser.
   // Tell Webpack to provide empty mocks for them so importing them works.
   node: {

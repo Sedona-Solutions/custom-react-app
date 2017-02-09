@@ -17,6 +17,7 @@ var InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 var WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
 var getClientEnvironment = require('./env');
 var paths = require('./paths');
+var getCustomConfig = require('./get-custom-config');
 
 // @remove-on-eject-begin
 // `path` is not used after eject - see https://github.com/facebookincubator/create-react-app/issues/1174
@@ -32,6 +33,8 @@ var publicPath = '/';
 var publicUrl = '';
 // Get environment variables to inject into our app.
 var env = getClientEnvironment(publicUrl);
+//Get custom configuration for injecting plugins, presets and loaders
+var customConfig = getCustomConfig(false);
 
 // This is the development configuration.
 // It is focused on developer experience and fast rebuilds.
@@ -128,7 +131,7 @@ module.exports = {
           /\.css$/,
           /\.json$/,
           /\.svg$/
-        ],
+        ].concat(customConfig.excludedFilesRegex),
         loader: 'url',
         query: {
           limit: 10000,
@@ -139,7 +142,21 @@ module.exports = {
       {
         test: /\.(ts|tsx)$/,
         include: paths.appSrc,
+        // TODO: move to customizers (TS/BABEL)
         loader: 'ts',
+        /*
+        loader: 'babel',
+        query: {
+          // @remove-on-eject-begin
+          babelrc: false,
+          presets: [require.resolve('babel-preset-react-app')].concat(customConfig.presets),
+          plugins: [].concat(customConfig.babelPlugins),
+          // @remove-on-eject-end
+          // This is a feature of `babel-loader` for webpack (not Babel itself).
+          // It enables caching results in ./node_modules/.cache/babel-loader/
+          // directory for faster rebuilds.
+          cacheDirectory: true
+        }*/
       },
       // "postcss" loader applies autoprefixer to our CSS.
       // "css" loader resolves paths in CSS and adds assets as dependencies.
@@ -148,7 +165,7 @@ module.exports = {
       // in development "style" loader enables hot editing of CSS.
       {
         test: /\.css$/,
-        loader: 'style!css?importLoaders=1!postcss'
+        loader: customConfig.values.CSS_MODULES ? customConfig.values.CSS_MODULES.dev : 'style!css?importLoaders=1!postcss'
       },
       // JSON is not enabled by default in Webpack but both Node and Browserify
       // allow it implicitly so we also enable it.
@@ -166,7 +183,7 @@ module.exports = {
       }
       // ** STOP ** Are you adding a new loader?
       // Remember to add the new extension(s) to the "url" loader exclusion list.
-    ]
+    ].concat(customConfig.loaders)
   },
   // We use PostCSS for autoprefixing only.
   postcss: function() {
@@ -207,7 +224,7 @@ module.exports = {
     // makes the discovery automatic so you don't have to restart.
     // See https://github.com/facebookincubator/create-react-app/issues/186
     new WatchMissingNodeModulesPlugin(paths.appNodeModules)
-  ],
+  ].concat(customConfig.plugins),
   // Some libraries import Node modules but don't use them in the browser.
   // Tell Webpack to provide empty mocks for them so importing them works.
   node: {

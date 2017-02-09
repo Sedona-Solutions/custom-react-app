@@ -107,7 +107,7 @@ module.exports = function(appPath, appName, verbose, originalDirectory, template
     // backward compatibility with old global-cli's.
     var cdpath;
     if (originalDirectory &&
-        path.join(originalDirectory, appName) === appPath) {
+      path.join(originalDirectory, appName) === appPath) {
       cdpath = appName;
     } else {
       cdpath = appPath;

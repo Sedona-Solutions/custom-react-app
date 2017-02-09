@@ -50,7 +50,9 @@ prompt(
   ];
 
   var files = [
+    path.join('config', 'customizers.js'),
     path.join('config', 'env.js'),
+    path.join('config', 'get-custom-config.js'),
     path.join('config', 'paths.js'),
     path.join('config', 'polyfills.js'),
     path.join('config', 'webpack.config.dev.js'),
@@ -77,12 +79,12 @@ prompt(
   files.forEach(function(file) {
     console.log('  Adding ' + cyan(file) + ' to the project');
     var content = fs
-      .readFileSync(path.join(ownPath, file), 'utf8')
-      // Remove dead code from .js files on eject
-      .replace(/\/\/ @remove-on-eject-begin([\s\S]*?)\/\/ @remove-on-eject-end/mg, '')
-      // Remove dead code from .applescript files on eject
-      .replace(/-- @remove-on-eject-begin([\s\S]*?)-- @remove-on-eject-end/mg, '')
-      .trim() + '\n';
+        .readFileSync(path.join(ownPath, file), 'utf8')
+        // Remove dead code from .js files on eject
+        .replace(/\/\/ @remove-on-eject-begin([\s\S]*?)\/\/ @remove-on-eject-end/mg, '')
+        // Remove dead code from .applescript files on eject
+        .replace(/-- @remove-on-eject-begin([\s\S]*?)-- @remove-on-eject-end/mg, '')
+        .trim() + '\n';
     fs.writeFileSync(path.join(appPath, file), content);
   });
   console.log();
