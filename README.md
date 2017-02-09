@@ -2,6 +2,8 @@
 
 Create custom React apps with Typescript.
 
+> ⚠️ This project is in its first stage ! It may break regularly, until we release a first beta.
+
 ### features
 
 react-scripts-sedona provide Typescript support thanks to wmonk/create-react-app-typescript
