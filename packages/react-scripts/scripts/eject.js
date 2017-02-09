@@ -57,6 +57,7 @@ prompt(
     path.join('config', 'webpack.config.prod.js'),
     path.join('config', 'jest', 'cssTransform.js'),
     path.join('config', 'jest', 'fileTransform.js'),
+    path.join('config', 'jest', 'typescriptTransform.js'),
     path.join('scripts', 'build.js'),
     path.join('scripts', 'start.js'),
     path.join('scripts', 'test.js')
@@ -88,8 +89,6 @@ prompt(
 
   var ownPackage = require(path.join(ownPath, 'package.json'));
   var appPackage = require(path.join(appPath, 'package.json'));
-  var babelConfig = JSON.parse(fs.readFileSync(path.join(ownPath, '.babelrc'), 'utf8'));
-  var eslintConfig = JSON.parse(fs.readFileSync(path.join(ownPath, '.eslintrc'), 'utf8'));
 
   console.log(cyan('Updating the dependencies'));
   var ownPackageName = ownPackage.name;
@@ -115,10 +114,10 @@ prompt(
   delete appPackage.scripts['eject'];
   Object.keys(appPackage.scripts).forEach(function (key) {
     appPackage.scripts[key] = appPackage.scripts[key]
-      .replace(/react-scripts (\w+)/g, 'node scripts/$1.js');
+      .replace(/react-scripts-ts (\w+)/g, 'node scripts/$1.js');
     console.log(
       '  Replacing ' +
-      cyan('"react-scripts ' + key + '"') +
+      cyan('"react-scripts-ts ' + key + '"') +
       ' with ' +
       cyan('"node scripts/' + key + '.js"')
     );
@@ -133,15 +132,6 @@ prompt(
     null,
     true
   );
-
-  // Add Babel config
-
-  console.log('  Adding ' + cyan('Babel') + ' preset');
-  appPackage.babel = babelConfig;
-
-  // Add ESlint config
-  console.log('  Adding ' + cyan('ESLint') +' configuration');
-  appPackage.eslintConfig = eslintConfig;
 
   fs.writeFileSync(
     path.join(appPath, 'package.json'),

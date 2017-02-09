@@ -86,7 +86,7 @@ module.exports = {
     // We also include JSX as a common component filename extension to support
     // some tools, although we do not recommend using it, see:
     // https://github.com/facebookincubator/create-react-app/issues/290
-    extensions: ['.js', '.json', '.jsx', ''],
+    extensions: ['.ts', '.tsx', '.js', '.json', '.jsx', ''],
     alias: {
       // Support React Native Web
       // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
@@ -106,8 +106,8 @@ module.exports = {
     // It's important to do this before Babel processes the JS.
     preLoaders: [
       {
-        test: /\.(js|jsx)$/,
-        loader: 'eslint',
+        test: /\.(ts|tsx)$/,
+        loader: 'tslint',
         include: paths.appSrc,
       }
     ],
@@ -124,6 +124,7 @@ module.exports = {
         exclude: [
           /\.html$/,
           /\.(js|jsx)$/,
+          /\.(ts|tsx)$/,
           /\.css$/,
           /\.json$/,
           /\.svg$/
@@ -134,21 +135,11 @@ module.exports = {
           name: 'static/media/[name].[hash:8].[ext]'
         }
       },
-      // Process JS with Babel.
+      // Compile .tsx?
       {
-        test: /\.(js|jsx)$/,
+        test: /\.(ts|tsx)$/,
         include: paths.appSrc,
-        loader: 'babel',
-        query: {
-          // @remove-on-eject-begin
-          babelrc: false,
-          presets: [require.resolve('babel-preset-react-app')],
-          // @remove-on-eject-end
-          // This is a feature of `babel-loader` for webpack (not Babel itself).
-          // It enables caching results in ./node_modules/.cache/babel-loader/
-          // directory for faster rebuilds.
-          cacheDirectory: true
-        }
+        loader: 'ts',
       },
       // "postcss" loader applies autoprefixer to our CSS.
       // "css" loader resolves paths in CSS and adds assets as dependencies.
@@ -177,13 +168,6 @@ module.exports = {
       // Remember to add the new extension(s) to the "url" loader exclusion list.
     ]
   },
-  // @remove-on-eject-begin
-  // Point ESLint to our predefined config.
-  eslint: {
-    configFile: path.join(__dirname, '../.eslintrc'),
-    useEslintrc: false
-  },
-  // @remove-on-eject-end
   // We use PostCSS for autoprefixing only.
   postcss: function() {
     return [
