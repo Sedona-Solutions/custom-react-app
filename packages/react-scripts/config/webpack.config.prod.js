@@ -97,7 +97,7 @@ module.exports = {
     // We also include JSX as a common component filename extension to support
     // some tools, although we do not recommend using it, see:
     // https://github.com/facebookincubator/create-react-app/issues/290
-    extensions: ['.ts', '.tsx', '.js', '.json', '.jsx', ''],
+    extensions: ['.json', ''].concat(customConfig.extensions),
     alias: {
       // Support React Native Web
       // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
@@ -115,13 +115,7 @@ module.exports = {
   module: {
     // First, run the linter.
     // It's important to do this before Babel processes the JS.
-    preLoaders: [
-      {
-        test: /\.(ts|tsx)$/,
-        loader: 'tslint',
-        include: paths.appSrc,
-      }
-    ],
+    preLoaders: customConfig.preLoaders,
     loaders: [
       // ** ADDING/UPDATING LOADERS **
       // The "url" loader handles all assets unless explicitly excluded.
@@ -145,21 +139,6 @@ module.exports = {
           limit: 10000,
           name: 'static/media/[name].[hash:8].[ext]'
         }
-      },
-      // Compile .tsx?
-      {
-        test: /\.(ts|tsx)$/,
-        include: paths.appSrc,
-        // TODO: move to customizers (TS/BABEL)
-        loader: 'ts',
-        // loader: 'babel',
-        // @remove-on-eject-begin
-        /*query: {
-          babelrc: false,
-          presets: [require.resolve('babel-preset-react-app')].concat(customConfig.presets),
-          plugins: [].concat(customConfig.babelPlugins),
-        },*/
-        // @remove-on-eject-end
       },
       // The notation here is somewhat confusing.
       // "postcss" loader applies autoprefixer to our CSS.

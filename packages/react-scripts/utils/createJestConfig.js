@@ -12,6 +12,10 @@
 const fs = require('fs');
 const paths = require('../config/paths');
 
+var getCustomConfig = require('../get-custom-config');
+var customConfig = getCustomConfig(false);
+
+
 module.exports = (resolve, rootDir, isEjecting) => {
   // Use this instead of `paths.testsSetup` to avoid putting
   // an absolute filename into configuration after ejecting.

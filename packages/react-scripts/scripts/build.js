@@ -31,11 +31,12 @@ var recursive = require('recursive-readdir');
 var stripAnsi = require('strip-ansi');
 var { highlight } = require('cli-highlight');
 
-
 var useYarn = fs.existsSync(paths.yarnLockFile);
 
+var isTs = (process.env.REACT_APP_TYPESCRIPT === 'true');
+
 // Warn and crash if required files are missing
-if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
+if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs]) {
   process.exit(1);
 }
 
@@ -130,30 +131,32 @@ function printErrors(summary, errors) {
   console.log(chalk.red(summary));
   console.log();
   errors.forEach(err => {
-    let linePointer;
-    if (err.loaderSource === 'ts-loader') {
-      if (err.file) {
-        const { line, character } = err.location;
-        const longestLineNumber = Array.from({ length: 7 }).map((_, i) => (line - 3) + i).reduce((a, b) => String(a).length === String(b).length ? String(a).length : String(a).length > String(b).length ? String(a).length : String(b).length);
-        const fileContent = highlight(fs.readFileSync(err.file, 'utf8'), { language: 'typescript' })
-          .split('\n');
-        const before = fileContent.slice(line - 4, line)
-          .reduce((lines, code, i) => 
-              lines.concat(`${padLeft(longestLineNumber, (line - 4) + (i + 1))} | ${code}`)
-              , [])
-        const pointer = Array.from({ length: character + 4 }).map(() => '-').concat('^');
-        const after = fileContent.slice(line, line + 4)
-          .reduce((lines, code, i) => 
-              lines.concat(`${padLeft(longestLineNumber, (line) + (i + 1))} | ${code}`)
-              , [])
+    if(isTs) {
+      let linePointer;
+      if (err.loaderSource === 'ts-loader') {
+        if (err.file) {
+          const { line, character } = err.location;
+          const longestLineNumber = Array.from({ length: 7 }).map((_, i) => (line - 3) + i).reduce((a, b) => String(a).length === String(b).length ? String(a).length : String(a).length > String(b).length ? String(a).length : String(b).length);
+          const fileContent = highlight(fs.readFileSync(err.file, 'utf8'), { language: 'typescript' })
+            .split('\n');
+          const before = fileContent.slice(line - 4, line)
+            .reduce((lines, code, i) => 
+                lines.concat(`${padLeft(longestLineNumber, (line - 4) + (i + 1))} | ${code}`)
+                , [])
+          const pointer = Array.from({ length: character + 4 }).map(() => '-').concat('^');
+          const after = fileContent.slice(line, line + 4)
+            .reduce((lines, code, i) => 
+                lines.concat(`${padLeft(longestLineNumber, (line) + (i + 1))} | ${code}`)
+                , [])
 
-        console.log('Error in ' + err.file);
-        linePointer = before.concat(pointer.join('')).concat(after).join('\n');
-      } else if (err.module) {
-        console.log('Error in ' + err.module.userRequest);
+          console.log('Error in ' + err.file);
+          linePointer = before.concat(pointer.join('')).concat(after).join('\n');
+        } else if (err.module) {
+          console.log('Error in ' + err.module.userRequest);
+        }
       }
     }
-
+    
     console.log(err.message || err);
     console.log();
     if (linePointer) {

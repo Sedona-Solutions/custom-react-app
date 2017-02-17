@@ -34,6 +34,10 @@ function resolveApp(relativePath) {
 // Otherwise, we risk importing Node.js core modules into an app instead of Webpack shims.
 // https://github.com/facebookincubator/create-react-app/issues/1023#issuecomment-265344421
 
+var isTs = (process.env.REACT_APP_TYPESCRIPT === 'true');
+console.log(isTs ? 'TypeScript detected' : 'No TypeScript detected');
+
+
 var nodePaths = (process.env.NODE_PATH || '')
   .split(process.platform === 'win32' ? ';' : ':')
   .filter(Boolean)
@@ -45,11 +49,11 @@ module.exports = {
   appBuild: resolveApp('build'),
   appPublic: resolveApp('public'),
   appHtml: resolveApp('public/index.html'),
-  appIndexJs: resolveApp('src/index.tsx'),
+  appIndexJs: resolveApp('src/index.' + (isTs ? 'tsx' : 'js')),
   appPackageJson: resolveApp('package.json'),
   appSrc: resolveApp('src'),
   yarnLockFile: resolveApp('yarn.lock'),
-  testsSetup: resolveApp('src/setupTests.ts'),
+  testsSetup: resolveApp('src/setupTests.' + (isTs ? 'ts' : 'js')),
   appNodeModules: resolveApp('node_modules'),
   ownNodeModules: resolveApp('node_modules'),
   nodePaths: nodePaths
@@ -65,11 +69,11 @@ module.exports = {
   appBuild: resolveApp('build'),
   appPublic: resolveApp('public'),
   appHtml: resolveApp('public/index.html'),
-  appIndexJs: resolveApp('src/index.tsx'),
+  appIndexJs:resolveApp('src/index.' + (isTs ? 'tsx' : 'js')),
   appPackageJson: resolveApp('package.json'),
   appSrc: resolveApp('src'),
   yarnLockFile: resolveApp('yarn.lock'),
-  testsSetup: resolveApp('src/setupTests.ts'),
+  testsSetup: resolveApp('src/setupTests.' + (isTs ? 'ts' : 'js')),
   appNodeModules: resolveApp('node_modules'),
   // this is empty with npm3 but node resolution searches higher anyway:
   ownNodeModules: resolveOwn('../node_modules'),
@@ -82,11 +86,11 @@ if (__dirname.indexOf(path.join('packages', 'react-scripts', 'config')) !== -1) 
     appBuild: resolveOwn('../../../build'),
     appPublic: resolveOwn('../template/public'),
     appHtml: resolveOwn('../template/public/index.html'),
-    appIndexJs: resolveOwn('../template/src/index.tsx'),
+    appIndexJs: resolveOwn('../template/src/index.' + (isTs ? 'tsx' : 'js')),
     appPackageJson: resolveOwn('../package.json'),
     appSrc: resolveOwn('../template/src'),
     yarnLockFile: resolveOwn('../template/yarn.lock'),
-    testsSetup: resolveOwn('../template/src/setupTests.ts'),
+    testsSetup: resolveOwn('../template/src/setupTests.' + (isTs ? 'tsx' : 'js')),
     appNodeModules: resolveOwn('../node_modules'),
     ownNodeModules: resolveOwn('../node_modules'),
     nodePaths: nodePaths

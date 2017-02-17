@@ -39,7 +39,7 @@ var customConfig = getCustomConfig(false);
 // This is the development configuration.
 // It is focused on developer experience and fast rebuilds.
 // The production configuration is different and lives in a separate file.
-module.exports = {
+var finalConfig = {
   // You may want 'eval' instead if you prefer to see the compiled output in DevTools.
   // See the discussion in https://github.com/facebookincubator/create-react-app/issues/343.
   devtool: 'cheap-module-source-map',
@@ -61,7 +61,7 @@ module.exports = {
     // We ship a few polyfills by default:
     require.resolve('./polyfills'),
     // Finally, this is your app's code:
-    paths.appIndexJs
+    paths.appIndexJs,
     // We include the app code last so that if there is a runtime error during
     // initialization, it doesn't blow up the WebpackDevServer client, and
     // changing JS code would still trigger a refresh.
@@ -89,7 +89,7 @@ module.exports = {
     // We also include JSX as a common component filename extension to support
     // some tools, although we do not recommend using it, see:
     // https://github.com/facebookincubator/create-react-app/issues/290
-    extensions: ['.ts', '.tsx', '.js', '.json', '.jsx', ''],
+    extensions: ['.json', ''].concat(customConfig.extensions),
     alias: {
       // Support React Native Web
       // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
@@ -106,14 +106,8 @@ module.exports = {
   // @remove-on-eject-end
   module: {
     // First, run the linter.
-    // It's important to do this before Babel processes the JS.
-    preLoaders: [
-      {
-        test: /\.(ts|tsx)$/,
-        loader: 'tslint',
-        include: paths.appSrc,
-      }
-    ],
+    // It's important to do this before Babel or TSC processes the JS / TS.
+    preLoaders: customConfig.preLoaders,
     loaders: [
       // ** ADDING/UPDATING LOADERS **
       // The "url" loader handles all assets unless explicitly excluded.
@@ -126,8 +120,6 @@ module.exports = {
       {
         exclude: [
           /\.html$/,
-          /\.(js|jsx)$/,
-          /\.(ts|tsx)$/,
           /\.css$/,
           /\.json$/,
           /\.svg$/
@@ -137,26 +129,6 @@ module.exports = {
           limit: 10000,
           name: 'static/media/[name].[hash:8].[ext]'
         }
-      },
-      // Compile .tsx?
-      {
-        test: /\.(ts|tsx)$/,
-        include: paths.appSrc,
-        // TODO: move to customizers (TS/BABEL)
-        loader: 'ts',
-        /*
-        loader: 'babel',
-        query: {
-          // @remove-on-eject-begin
-          babelrc: false,
-          presets: [require.resolve('babel-preset-react-app')].concat(customConfig.presets),
-          plugins: [].concat(customConfig.babelPlugins),
-          // @remove-on-eject-end
-          // This is a feature of `babel-loader` for webpack (not Babel itself).
-          // It enables caching results in ./node_modules/.cache/babel-loader/
-          // directory for faster rebuilds.
-          cacheDirectory: true
-        }*/
       },
       // "postcss" loader applies autoprefixer to our CSS.
       // "css" loader resolves paths in CSS and adds assets as dependencies.
@@ -186,7 +158,7 @@ module.exports = {
     ].concat(customConfig.loaders)
   },
   // We use PostCSS for autoprefixing only.
-  postcss: function() {
+  postcss: function () {
     return [
       autoprefixer({
         browsers: [
@@ -233,3 +205,7 @@ module.exports = {
     tls: 'empty'
   }
 };
+
+console.log(finalConfig);
+
+module.exports = finalConfig;

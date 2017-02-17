@@ -20,6 +20,9 @@ function getCustomConfig(prod) {
         if (customizer.fileRegex) {
           finalConfig.excludedFilesRegex.push(customizer.fileRegex);
         }
+        if (customizer.extensions) {
+          finalConfig.extensions = finalConfig.extensions.concat(customizer.extensions);
+        }
         finalConfig.values[customizerKey] = customizer.config || true;
       }
       return finalConfig;
@@ -28,9 +31,21 @@ function getCustomConfig(prod) {
       babelPlugins: [],
       plugins: [],
       loaders: [],
+      preLoaders: [],
       values: {},
-      excludedFilesRegex: []
+      excludedFilesRegex: [],
+      extensions: []
     });
+
+  if (process.env['REACT_APP_BABEL']) {
+    result.loaders = result.loaders.map(function (loader) {
+      if (loader.loader === 'babel') {
+        Array.prototype.push.apply(loader.query.presets, result.presets);
+        Array.prototype.push.apply(loader.query.plugins, result.babelPlugins);
+      }
+      return loader;
+    });
+  }
 
   return result;
 }
